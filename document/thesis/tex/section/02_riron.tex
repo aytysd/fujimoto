@@ -1,0 +1,198 @@
+%! Tex root = ../main.tex
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    \documentclass[12pt]{honka_v1}
+    \usepackage{soturon}
+    \begin{document}
+\fi
+% 以下本文
+\section{理論}
+本章では，本研究の前提となる知見や技術について説明する．
+\subsection{Docker}
+Dockerはコンテナ技術の一種で，
+システムの環境ごとに隔離した空間を用意して独自のディレクトリツリーを提供する．
+Dockerコンテナはそれ単体でシステムが完結しているため，
+Dockerコンテナを別のサーバにコピーして起動させることも容易であり，ポータビリティ性を有している\cite{bib:docker-book}．
+本論文ではDockerを用いて機能ごとにDockerコンテナを作成する．
+
+\subsubsection{Dockerイメージ}
+DockerイメージはDockerコンテナ作成を支援するために用意されたアーカイブパッケージである．
+Dockerコンテナは独立したシステム実行環境であるため，
+一から構築するにはOSやライブラリなど全てを作り込む必要があり非常に手間がかかる．
+Dockerコンテナ作成に必要なファイルを纏めたアーカイブパッケージがDockerイメージである\cite{bib:docker-book}．
+DockerイメージはDocker社が運営しているDocker Hubで登録・公開されており，
+Docker Hubに公開されているDockerイメージをダウンロードしてDockerコンテナを作成することが可能である．
+
+Dockerイメージには以下の2種類ある．
+\begin{itemize}
+    \item 基本的なLinuxディストリビューションだけのDockerイメージ
+    \item アプリケーション入りのDockerイメージ
+\end{itemize}
+
+本論文では後者のアプリケーション入りのDockerイメージを用いてシステムのDockerコンテナを作成する．
+
+
+\subsubsection{Dockerfile}
+Dockerfileは自作のイメージを作るもので，
+ベースとなるイメージに対してどのような変更指示をするかをまとめたファイルである．
+Dockerfileは「docker build」コマンドを用いてビルドすることでDockerイメージを作成できる\cite{bib:docker-book}．
+
+\subsubsection{Dockerネットワーク}
+Dockerコンテナは独立しており，1つのDockerコンテナがサーバマシンのような役割を持っている．
+Dockerコンテナ間が通信するためにDocker内に仮想的なネットワークを構築する必要がある．
+Dockerには以下の3種類のネットワークが用意されている．
+\begin{itemize}
+    \item bridgeネットワーク
+    \item hostネットワーク
+    \item noneネットワーク
+\end{itemize}
+ここでは，本論文で利用するbridgeのみ説明し，他2種類については説明を省く．
+
+bridgeネットワークではIPマスカレードを利用してホストPCが所属する新たな内部ネットワークを構築している．
+\reff{fig:bridge-net}にApacheのDockerコンテナを2つ起動し，
+それぞれのポートをホストPCの8080と8081に接続した時の例を示す．
+
+\myfigurem{./images/bridgenetwork.pdf}{bridgeネットワーク例}{fig:bridge-net}
+
+\subsubsection{Docker Compose}
+Docker Composeは複数のDockerコンテナの作成およびDockerコンテナ間のネットワークの作成など，
+複数のDockerコンテナの作成・停止・破棄の一連の操作をまとめて実行する仕組みのことである\cite{bib:docker-book}．
+一連のDockerコンテナやシステムについての定義ファイル(Composeファイル)は既定では「docker-compose.yml」というファイル名になっている．
+Composeファイルを「docker-compose(docker compose)」コマンドで実行すると
+ボリュームやネットワークが作成され，まとめてDockerコンテナを起動できる．
+停止や削除するときも同様のコマンドで行うことができる．
+本論文で実装する通知や行動履歴表示といった一連のシステム
+をまとめて起動・制御するためにDocker Composeを用いる．
+
+\subsection{Node.js}
+Node.jsはJavaScriptのランタイム環境であり，
+Webブラウザの中でなく単独でJavaScriptのプログラムを実行できるようになっているものである\cite{bib:node-book}．
+ランタイム環境であることで，従来のJavaScriptではクライアント側の実装でしか使えなかったが，
+サーバ側でもJavaScriptを利用でき，Web開発の全てをJavaScriptのみで完結することができるようになっている．
+Node.jsはWebサーバのための機能を備えており，容易にサーバ側の実装を行うことができる．
+
+\subsubsection{npm}
+npmはNode.js専用のパッケージマネージャの一種である\cite{bib:node-book}．
+Node.jsではNode.jsの機能を拡張する様々なプログラムがパッケージとして配布されている．
+その多種多様なパッケージをインストール・管理するシステムとしてnpmが用意されている．
+
+\subsubsection{Express}
+ExpressはNode.jsのフレームワークの一種で，
+Node.jsの機能をわかりやすくし基本的なWebアプリケーション機能を比較的軽量で提供できる\cite{bib:node-book}．
+% \subsubsection{routing}
+
+\subsection{Leaflet.js}
+Leaflet.jsはVolodymyr Agafonkin氏によって作成されたJavaScriptのマップライブラリである．
+マーカの表示やポップアップ，地図の拡大縮小など基本的な地図アプリの機能を提供しており，
+EdgeやChrome，Firefox，Safariなどの基本的なブラウザをサポートしている\cite{bib:leafletjs-web}．
+
+本論文では畑の地図表示および害獣の行動経路を線として，センサノードの位置をマーカとして図示することに用いる．
+
+\subsection{WebPush}
+WebPushはWebアプリケーションがサーバからメッセージを受信できる仕組みのことである．
+Webアプリケーションがフォアグランド状態や読み込まれているかどうかに関わらず，
+リアルタイムな通知を提供することができる．
+WebアプリケーションがPush通知のメッセージを送信するには受信側が「サービスワーカー」を登録している必要がある\cite{bib:pushapi-web}．
+
+WebPushの一般的なモデルを\reff{fig:webpush-overview}に示す．
+WebPushはまず利用者がPushサーバに登録を行い，同時にアプリケーションサーバに登録情報を共有する．
+この時にサービスワーカーを利用者側に登録する．
+アプリケーションサーバは共有された登録情報を用いてPushメッセージを
+Pushサーバを経由して利用者に送り，Push通知を実現する\cite{bib:webpush-rfc}．
+
+\myfigure{./images/webpush-overview.pdf}{WebPushの模式図}{fig:webpush-overview}
+
+WebPushは基本的なブラウザで保証されていて，\reft{tb:WebPush-browser}に示すブラウザでは保証が確認されている\cite{bib:pushapi-web}．
+
+\begin{table}[htbp]
+    \caption{WebPushが保証されているブラウザ\cite{bib:pushapi-web}}
+    \label{tb:WebPush-browser}
+    \centering
+    \begin{tabular}{c|c}\hline
+        パソコン & スマートフォン \\
+        \hline
+        Chrome & Chrome Android\\
+        Firefox & Firefox for Android\\
+        Opera & Opera Android \\
+        Safari & Safari on iOS\\
+        Edge & Samsung Internet\\
+        \hline
+    \end{tabular}
+\end{table}
+% \begin{itemize}
+%     \item Chrome
+%     \item Edge
+%     \item Firefox
+%     \item Opera
+%     \item Safari
+%     \item Chrome Android
+%     \item Firefox for Android
+%     \item Opera Android
+%     \item Safari on iOS
+%     \item Samsung Internet
+% \end{itemize}
+
+\subsubsection{サービスワーカー(Service Worker)}
+サービスワーカーはあるオリジン(プロトコル・ポート番号・ホストの3つの組)とパスに対して登録された
+イベント駆動型のJavaScriptファイルである\cite{bib:serviceworker-web}．
+
+\subsubsection{VAPID(Voluntary Application Server Identification)}
+VAPIDはアプリケーションサーバをPushサービスに認証・識別してもらうための仕組みである\cite{bib:vapid-rfc}．
+RFC8030\cite{bib:webpush-rfc}に記載されているWebPushにはアプリケーションサーバを認証する構造が含まれておらず，
+アプリケーションサーバになりすました通信が行われる問題点がある．
+ここでVAPIDによってアプリケーションサーバの識別をすることで，
+アプリケーションサーバになりすました通信を防ぐことができるようになる．
+
+
+\subsection{Nginx}
+Nginxは元々Igor Sysoev氏が作成したHTTPサーバやリバースプロキシサーバ，メールプロキシサーバといった
+汎用的なTCP/UDPプロキシサーバである\cite{bib:nginx-web}．
+本論文においてはクラウドサーバ内のリバースプロキシサーバとして活用する．
+
+% \subsection{Reverse Proxy}
+
+
+% ソースコードの記述
+% \mylisting{ファイルパス}{caption}{label}
+% \mylisting{report.sty}{レポートのスタイルファイル}{fig:style}
+
+% 図の配置
+% \myfigure{ファイルパス}{caption}{label} サイズが画面横の10割
+% \myfigureh{ファイルパス}{caption}{label} サイズが画面縦の10割
+% \myfigurem{ファイルパス}{caption}{label} サイズが画面横の6割
+% \myfigures{ファイルパス}{caption}{label}{size} サイズが画面横の{size}割
+
+% \myfigure{figure.png}{画像ファイル}{fig:image}
+% \reff{fig:image}
+
+% 式の作成
+% \begin{align}
+%     \label{for:opamp_inout_char}
+%     V_o = A \times (V_+ - V_-)
+% \end{align}
+% \refe{for:opamp_inout_char}
+
+% 表の作成
+% \reft{tb:}
+% \begin{table}[htbp]
+%     \caption{}
+%     \label{tb:}
+%     \centering
+%     \begin{tabular}{|c|c|c|c|c|c|}\hline
+%         器具名 & 個数 & メーカー & 型番 & シリアル番号 & 管理番号 \\ \hline
+%         \hline
+%         TTL-IC用直流電源 & 1台 & --- & --- & --- & 2班 \\ \hline
+%     \end{tabular}
+% \end{table}
+
+% 箇条書き
+% \begin{itemize}
+%     \item 
+% \end{itemize}
+
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    % ----- 仕掛け 開始 -----
+    \newcommand{\ifdraft}{false}
+    % ----- 仕掛け 終了 -----
+    \include{99_references.tex}
+    \end{document}
+\fi

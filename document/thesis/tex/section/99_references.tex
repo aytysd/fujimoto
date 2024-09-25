@@ -1,0 +1,61 @@
+%! Tex root = ../main.tex
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    \documentclass[12pt]{honka_v1}
+    \usepackage{soturon}
+    \begin{document}
+\fi
+% 以下本文
+% \printbibliography[title=参考文献]
+% 参考文献をchapterとして目次に追加
+% \addcontentsline{toc}{chapter}{参考文献}
+\begin{thebibliography}{99}
+    \bibitem{bib:jugaihigai-web} 農林水産省, ``野生鳥獣による農作物被害状況の推移'', \url{https://www.maff.go.jp/j/seisan/tyozyu/higai/hogai_zyoukyou/attach/pdf/index-31.pdf}, \refdate{2024年1月18日}.
+    
+    \bibitem{bib:docker-book} 大澤文孝, 浅井尚, ``触って学ぶクラウドインフラ docker 基礎からのコンテナ構築'', 日経BPマーケティング, 2020年.
+    
+    \bibitem{bib:node-book} 掌田津耶乃, ``Node.js 超入門'', 株式会社 秀和システム, 2017年.
+    \bibitem{bib:express-web} StrongLoop, IBM, ``Express - Node.js web application framework'', \url{https://expressjs.com/}, \refdate{2024年1月18日}.
+    \bibitem{bib:leafletjs-web} Volodymyr Agafonkin, ``Leaflet - a JavaScript library for interactive maps'', \url{https://leafletjs.com}, \refdate{2024年1月18日}.
+    
+    \bibitem{bib:pushapi-web} Mozilla Foundation, ``プッシュ API - Web API \textbar\ MDN'', \url{https://developer.mozilla.org/ja/docs/Web/API/Push_API}, \refdate{2024年1月18日}.
+    \bibitem{bib:webpush-rfc} M. Thomson, E. Damaggio, B. Raymor, Ed., ``Generic Event Delivery Using HTTP Push'', \url{https://datatracker.ietf.org/doc/html/rfc8030}, RFC8030, December 2016, \refdate{2024年1月21日}.
+    \bibitem{bib:serviceworker-web} Mozilla Foundation, ``サービスワーカー API - Web API \textbar\ MDN'', \url{https://developer.mozilla.org/ja/docs/Web/API/Service_Worker_API}, \refdate{2024年1月18日}.
+    \bibitem{bib:vapid-rfc} M. Thomson, P. Beverloo, ``Voluntary Application Server Identification (VAPID)'', \url{https://datatracker.ietf.org/doc/html/rfc8292}, RFC8292, November 2017, \refdate{2024年1月21日}.
+    
+    \bibitem{bib:nginx-web} Nginx, ``nginx'', \url{https://nginx.org/en/}, \refdate{2024年1月18日}.
+    \bibitem{bib:postform-web} Mozilla Foundation, ``POST - HTTP \textbar\ MDN'', \url{https://developer.mozilla.org/ja/docs/Web/HTTP/Methods/POST}, \refdate{2024年1月22日}.
+    % \bibitem{bib:} , "", \url{https://developer.mozilla.org/ja/docs/Web/HTTP/Methods/POST}, \refdate{2024年1月22日}.
+    
+    
+    % \bibitem{bib:Ishizaka}
+    % 石坂守，山口賢一，岩田大志:``スキャン非同期記憶素子およびそれを備えた半導体集積回路ならびにその設計方法およびテストパターン'', 電子情報通信学会論文A,Vol.j102-A,No.6,pp.172-181,Jun.(2019)
+
+    % \bibitem{textbook} \UTF{9AD9}玉 圭樹, "マルエージェント学習 -- 相互作用の謎に迫る --", 株式会社コロナ社, 2003年4月23日.
+    % \bibitem{book} author, "title", publish, 2020.
+    % \bibitem{webpage} author, "title", \url{URL}, \refdate{2021年8月15日}.
+\end{thebibliography}
+
+% なるべく書籍がいい
+% 念の為の公式のテキストもメモ
+% 
+% * docker
+% 本がある
+% * docker-compose
+% 本がある
+% * Node.js
+% * Leaflet.js
+% https://leafletjs.com
+% * PushAPI
+% https://www.w3.org/TR/push-api/
+% https://www.w3.org/standards/types/#WD
+% https://developer.mozilla.org/en-US/docs/Web/API/Push_API
+% * Nginx
+% * Reverse Proxy
+
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    % ----- 仕掛け 開始 -----
+    \newcommand{\ifdraft}{false}
+    % ----- 仕掛け 終了 -----
+    % \include{references.tex}
+    \end{document}
+\fi

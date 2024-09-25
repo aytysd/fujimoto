@@ -1,0 +1,225 @@
+%
+% 
+% 
+% 参考 styleファイル
+% https://gist.github.com/tadaren/d51211176bfd533b26653b445df3dfa5
+% 
+
+% 余白設定
+\usepackage[top=20truemm,bottom=23truemm,left=20truemm,right=20truemm]{geometry}
+\setlength{\textwidth}{40zw}  % 1行の文字数40(少し右の余白がさらに余る)
+
+
+\usepackage{url}        % url記述用
+\usepackage{cite}       % bibTex用
+\usepackage{amsmath}
+\usepackage{okumacro}
+\usepackage{otf}
+% \usepackage{svg}
+
+% ページをまたぐ表用
+\usepackage{longtable}
+\setlength\LTcapwidth{\linewidth}
+
+% 画像読み込み
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{here}   % 画像の位置を記述位置にする
+
+% 表のセルの縦結合
+\usepackage{multirow}
+
+% ソースコード記述用
+\usepackage{listings}
+\usepackage{jlisting} % 環境によってはないかも
+\renewcommand{\lstlistingname}{図} %ソースコードも図として貼る
+% listingsの番号をfigureに変更
+\def\fnum@lstlisting{%
+  \lstlistingname
+  \ifx\lst@@caption\@empty\else~\thefigure\fi}
+\lstset{%
+  % language={C},%
+  % basicstyle={\small},%
+  % identifierstyle={\small},%
+  % commentstyle={\small\itshape\color[rgb]{0,0.5,0}},%
+  % keywordstyle={\small\bfseries\color[rgb]{0,0,1}},%
+  % ndkeywordstyle={\small},%
+  % stringstyle={\small\ttfamily\color[rgb]{1,0,1}},%
+  frame=single,%
+  breaklines=true,%
+  columns=[l]{fullflexible},%
+  % numbers=left,%
+  xrightmargin=0zw,%
+  xleftmargin=3zw,%
+  numberstyle={\scriptsize},%
+  stepnumber=1,%
+  numbersep=1zw,%
+  lineskip=-0.5ex,%
+  keepspaces=true,%
+  captionpos=b,%
+  basicstyle=\ttfamily
+}
+
+\def\figuresize{0.8\textwidth}
+\def\figureheight{0.8\textheight}
+
+\renewcommand{\bibname}{参考文献}    % bibTexの章を書き換え
+\newcommand*{\refdate}[1]{#1参照}   % 日付の参照
+
+\makeatletter
+
+	\renewcommand{\theequation}{% 式番号の付け方
+
+	\thesection.\arabic{equation}}
+
+	\@addtoreset{equation}{section}
+ 
+	\renewcommand{\thefigure}{% 図番号の付け方
+
+	\thesection.\arabic{figure}}
+
+	\@addtoreset{figure}{section}
+ 
+	\renewcommand{\thetable}{% 表番号の付け方
+
+	\thesection.\arabic{table}}
+
+	\@addtoreset{table}{section}
+
+\makeatother
+
+% chapterの再定義
+% 上余白なし，下余白1
+\def\@makechapterhead#1{\hbox{}%
+  {\parindent\z@
+   \raggedright
+   \normalfont\Large\bfseries
+   \leavevmode
+   \ifnum \c@secnumdepth >\m@ne
+     \setlength\@tempdima{\linewidth}%
+     \setbox\z@\hbox{\@chapapp\thechapter\@chappos\hskip1zw}%
+     \addtolength\@tempdima{-\wd\z@}%
+     \unhbox\z@\nobreak
+     \vtop{\hsize\@tempdima#1}%
+   \else
+     #1\relax
+   \fi}\nobreak\vskip1\Cvs}
+\def\@makeschapterhead#1{\hbox{}%
+  {\parindent\z@
+   \raggedright
+   \normalfont\Large\bfseries
+   \leavevmode
+   \setlength\@tempdima{\linewidth}%
+   \vtop{\hsize\@tempdima#1}}\vskip1\Cvs}
+
+% sectionの再定義
+% 上余白と下余白を調整
+\renewcommand{\section}{\@startsection{section}{1}{\z@}%
+   {1.0\Cvs}%
+   {.8\Cvs}%
+   {\normalfont\Large\bfseries}
+}
+
+
+% ======= マクロ =======
+% 図入力簡易化マクロ
+\newcommand{\myfigure}[3]{%
+  \refstepcounter{lstlisting}
+  \begin{figure}[H]%
+    \centering%
+    \includegraphics[width=\figuresize]{#1}%
+    \caption{#2}%
+    \label{#3}%
+  \end{figure}%
+}
+\newcommand{\myfigureh}[3]{%
+  \refstepcounter{lstlisting}
+  \begin{figure}[H]%
+    \centering%
+    \includegraphics[height=\figureheight]{#1}%
+    \caption{#2}%
+    \label{#3}%
+  \end{figure}%
+}
+\newcommand{\myfigurem}[3]{%
+  \refstepcounter{lstlisting}
+  \begin{figure}[H]%
+    \centering%
+    \includegraphics[width=0.6\hsize]{#1}%
+    \caption{#2}%
+    \label{#3}%
+  \end{figure}%
+}
+\newcommand{\myfigures}[4]{%
+  \refstepcounter{lstlisting}
+  \begin{figure}[H]%
+    \centering%
+    \includegraphics[width=0.#4\hsize]{#1}%
+    \caption{#2}%
+    \label{#3}%
+  \end{figure}%
+}
+% ソースコード入力簡易化マクロ
+\newcommand{\mylistingD}[3]{
+  \begin{figure}[H]
+    \lstinputlisting{#1}
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}
+% 上は非推奨下を使う
+\newcommand{\mylisting}[3]{
+  \begin{center}
+    \vspace{8pt}
+    \refstepcounter{figure}
+    \lstset{
+      frame=single
+    }
+    \lstinputlisting[caption=#2, label=#3]{#1}
+  \end{center}
+  
+}
+\newcommand{\mylistingnum}[3]{
+  \begin{center}
+    \refstepcounter{figure}
+    \vspace{8pt}
+    \lstset{
+      numbers=left,
+      frame=single
+    }
+    \lstinputlisting[caption=#2, label=#3]{#1}
+  \end{center}
+}
+%shadowbox用
+\newcommand{\mylistingsd}[3]{
+  \begin{center}
+    \vspace{8pt}
+    \refstepcounter{figure}
+    \lstset{
+      frame=shadowbox
+    }
+    \lstinputlisting[caption=#2, label=#3]{#1}
+  \end{center}
+}
+\newcommand{\mylistingsdnum}[3]{
+  \begin{center}
+    \refstepcounter{figure}
+    \vspace{8pt}
+    \lstset{
+      numbers=left,
+      frame=shadowbox
+    }
+    \lstinputlisting[caption=#2, label=#3]{#1}
+  \end{center}
+}
+% 参照(図)
+\newcommand{\reff}[1]{
+  図\ref{#1}
+}
+% 参照(表)
+\newcommand{\reft}[1]{
+  表\ref{#1}
+}
+% 参照(式)
+\newcommand{\refe}[1]{
+  (\ref{#1})
+}

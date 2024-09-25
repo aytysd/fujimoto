@@ -1,0 +1,25 @@
+%! Tex root = ../main.tex
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    \documentclass[12pt]{honka_v1}
+    \usepackage{soturon}
+    \begin{document}
+\fi
+
+\wordsofthanks{
+    本研究を行うにあたって
+    親身かつ丁寧にご指導してくださりました，
+    山口賢一教授，岩田大志准教授に最大限の感謝したします．
+    
+    研究を行う際に助言や相談に乗っていただいた，
+    山口賢一研究室，岩田研究室の皆様，心よりお礼申し上げます．
+    特に共に研究を行なった山口賢一研究室の山口璃桜さん，岩田研究室の松尾慧一さん
+    には感謝の意を表します．
+}
+
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    % ----- 仕掛け 開始 -----
+    \newcommand{\ifdraft}{false}
+    % ----- 仕掛け 終了 -----
+    \include{99_references.tex}
+    \end{document}
+\fi

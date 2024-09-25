@@ -1,0 +1,108 @@
+基本的にteamsにあげたlinkを拾ってきて列挙しただけのやつ
+
+# 獣害被害
+- https://www.maff.go.jp/j/seisan/tyozyu/higai/manyuaru/attach/pdf/manual-14.pdf
+
+# 通知比較
+- https://repro.io/contents/ios-remote-push-notifications-in-a-nutshell/
+- https://anykey.bz/android/chrome-web-notification/
+- https://himanago.hatenablog.com/entry/2019/03/01/020800
+- https://www.linebiz.com/jp/service/line-official-account/plan/
+
+# 地図表示
+- https://www.hcc.co.jp/faq/20190225/
+- https://qiita.com/kiseragi/items/5d4f2ff7c472faac59a9
+- https://developers.google.com/maps/documentation/embed/get-started?_gl=1*1ymafhl*_ga*MTgzMzg1MDUzMC4xNjkxNjAzNjE1*_ga_NRWSTWS78N*MTY5NjkyMjY5NS4yLjAuMTY5NjkyMjY5Ny4wLjAuMA..&hl=ja
+- https://github.com/komoot/staticmap
+- https://leafletjs.com/reference.html
+- https://ops.jig-saw.com/tech-cate/leaflet_maps
+- https://maps.gsi.go.jp/development/ichiran.html
+- https://www.openstreetmap.org/copyright/ja
+- https://leafletjs.com/examples.html
+- https://leafletjs.com/examples/quick-start/
+- https://qiita.com/halboujp/items/09f02cbd93f2b846ef35
+
+# Node.js Express関係
+- https://zenn.dev/aono/articles/629c8a7a0d7d6c
+- https://www.i-ryo.com/entry/2020/04/16/215205
+
+# reverse proxy
+- https://qiita.com/zawawahoge/items/d58ab6b746625e8d4457
+- https://www.geekly.co.jp/column/cat-technology/1903_096/
+
+# SQLのAPI
+- https://qiita.com/niisan1ban/items/f70eb0ed891568f71f9b
+
+# docker
+- https://docs.docker.jp/v1.12/compose/compose-file.html
+# dockerのマルチステージビルド
+- https://zenn.dev/kouchanne/articles/6485193823ecec5735d4
+# dockerのセキュリティ
+- https://qiita.com/SolKul/items/989727aeeafcae28ecf7
+
+# git参考
+- https://tech-blog.rakus.co.jp/entry/20200529/git
+- https://qiita.com/tkmd35/items/9612c03dc60b1c516969
+- https://qiita.com/siida36/items/880d92559af9bd245c34
+- https://zenn.dev/masatotezuka/articles/0c561138491569
+- https://qiita.com/yukiya1006/items/4a491df3595662d8f781
+- https://qiita.com/shuntaro_tamura/items/06281261d893acf049ed
+
+# クラウド比較
+- https://aws.amazon.com/jp/free/?all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=tier%23always-free&awsf.Free%20Tier%20Categories=*all&awsm.page-all-free-tier=1
+- https://azure.microsoft.com/ja-jp/pricing/purchase-options/pay-as-you-go/#all-free-services
+- https://azure.microsoft.com/ja-jp/pricing/details/api-management/
+- https://azure.microsoft.com/ja-jp/pricing/details/app-center/
+- https://cloud.google.com/free/docs/free-cloud-features?hl=ja#free-tier-usage-limits
+- https://cloud.sakura.ad.jp/payment/
+```
+機能が多くて比較が大変だった(使ったことがなくてよくわからなかった)ので無料枠でどれだけ使えるかをピックアップしてまとめる．
+
+AWSとAzure，GCPは割と高機能っぽいので課金を厭わなければどれも甲乙なさそうな印象．
+
+AWSは利用者数に比例したドキュメント数の多さ，Azureは安全性，GCPは機械学習向けみたいに書かれていたりした．
+
+AWS
+
+https://aws.amazon.com/jp/free/?all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=tier%23always-free&awsf.Free%20Tier%20Categories=*all&awsm.page-all-free-tier=1
+
+アプリとかIoT系，コンテナ系の完全無料枠がほとんどない感じ
+
+AWS Lambda : イベント発生時にコード実行，管理 : 制限あり常時無料
+Amazon S3 : 仮装マシン : 制限あり期間限定無料
+Amazon EC2 : クラウドリソース?コンテナ? : 制限あり期間限定無料
+AWS IoT Core : IoTデバイスの接続 : 制限あり期間限定無料
+
+Azure
+
+https://azure.microsoft.com/ja-jp/pricing/purchase-options/pay-as-you-go/#all-free-services
+
+割と無料でアプリのデプロイとかできそう感(通信量の制限がどれだけ狭いか感覚がないからわからないけど)
+
+App Service : アプリ作成 : 制限あり常時無料
+API Management : APIの管理? : 制限あり?常時無料 https://azure.microsoft.com/ja-jp/pricing/details/api-management/
+IoT Hub : IoTの接続，管理など : 制限あり常時無料
+Notification Hubs : プッシュ通知 ：制限あり常時無料
+Container Apps : サーバレスコンテナでのデプロイ : 制限あり常時無料
+WebPubSub : Webアプリとモバイルアプリのリアルタイム双方向通信 : 制限あり常時無料
+App Center : 各OSごとのアプリをビルド : 有料? https://azure.microsoft.com/ja-jp/pricing/details/app-center/
+Container Instances : コンテナの起動，実行 : 有料
+
+GCP
+
+https://cloud.google.com/free/docs/free-cloud-features?hl=ja#free-tier-usage-limits
+
+App Engine : サーバレスアプリケーションプラットフォーム : 制限あり無料
+Conpute Engine : 仮想マシン : 制限あり無料
+Cloud Build : Dockerコンテナでのビルドステップ用 : 制限あり無料
+Cloud Run : コンテナ化アプリの運用 : 制限あり無料
+Cloud IoT Core : IoTデバイスの管理，統合，接続を行う : 廃止
+
+さくら
+
+https://cloud.sakura.ad.jp/payment/
+
+珍しく従量課金じゃなくて利用時間に対応した金額テーブルをしている．
+
+無料枠はなさそう．
+```

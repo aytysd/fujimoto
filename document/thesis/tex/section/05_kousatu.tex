@@ -1,0 +1,55 @@
+%! Tex root = ../main.tex
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    \documentclass[12pt]{honka_v1}
+    \usepackage{soturon}
+    \begin{document}
+\fi
+% 以下本文
+\section{考察}
+% 考察・検討を書く
+
+% ソースコードの記述
+% \mylisting{ファイルパス}{caption}{label}
+% \mylisting{report.sty}{レポートのスタイルファイル}{fig:style}
+
+% 図の配置
+% \myfigure{ファイルパス}{caption}{label} サイズが画面横の10割
+% \myfigureh{ファイルパス}{caption}{label} サイズが画面縦の10割
+% \myfigurem{ファイルパス}{caption}{label} サイズが画面横の6割
+% \myfigures{ファイルパス}{caption}{label}{size} サイズが画面横の{size}割
+
+% \myfigure{figure.png}{画像ファイル}{fig:image}
+% \reff{fig:image}
+
+% 式の作成
+% \begin{align}
+%     \label{for:opamp_inout_char}
+%     V_o = A \times (V_+ - V_-)
+% \end{align}
+% \refe{for:opamp_inout_char}
+
+% 表の作成
+% \reft{tb:}
+% \begin{table}[htbp]
+%     \caption{}
+%     \label{tb:}
+%     \centering
+%     \begin{tabular}{|c|c|c|c|c|c|}\hline
+%         器具名 & 個数 & メーカー & 型番 & シリアル番号 & 管理番号 \\ \hline
+%         \hline
+%         TTL-IC用直流電源 & 1台 & --- & --- & --- & 2班 \\ \hline
+%     \end{tabular}
+% \end{table}
+
+% 箇条書き
+% \begin{itemize}
+%     \item 
+% \end{itemize}
+
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    % ----- 仕掛け 開始 -----
+    \newcommand{\ifdraft}{false}
+    % ----- 仕掛け 終了 -----
+    \include{99_references.tex}
+    \end{document}
+\fi

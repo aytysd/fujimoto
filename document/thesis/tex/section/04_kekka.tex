@@ -1,0 +1,210 @@
+%! Tex root = ../main.tex
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    \documentclass[12pt]{honka_v1}
+    \usepackage{soturon}
+    \begin{document}
+\fi
+% 以下本文
+\section{検証実験}
+\subsection{実験方法}
+\subsubsection{ゲートウェイのLTEモジュールとの疎通実験}
+ゲートウェイが使用するLTE通信モジュールとクラウドサーバ間での
+POST形式での通信が可能か確認する．
+
+実験手順としてはゲートウェイに搭載予定のLTEモジュールからInternetを経由させて
+用意したサーバにデータを送信し，通信を確認する．
+LTEモジュールから送信は
+POST形式でHTTP通信を用いて行う．
+また，送るデータはJSON形式で送信し，データ内容としては\reft{tb:lte-json}に示す．
+
+\begin{table}[htbp]
+    \caption{LTE通信するJSONデータ}
+    \label{tb:lte-json}
+    \centering
+    \begin{tabular}{c|c|l}\hline
+        データ名 & データフォーマット & 注釈 \\
+        \hline
+        \multirow{2}{*}{timestamp} & 文字列 & 検出時刻 \\
+        & {\footnotesize(YYYYMMDDHHMMSSSSS)} & {\footnotesize(年月日,時分秒[ms])} \\
+        node & 数値 & センサノード番号 \\
+        dir & 数値 & ノード内のセンサ番号 \\
+        sd & (任意長) & センサデータ{\footnotesize(サンプリングデータ)} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\subsubsection{通知サーバのWebPush実験}
+クラウドサーバの構成要素である通知サーバ(Notification-app)から
+WebPushによる通知ができるかどうかを確認する．
+
+実験手順としては以下の通りである．
+\begin{enumerate}
+    \item Docker Composeでサーバを起動する．
+    \item ブラウザアプリで起動したサーバにアクセスする．
+    \item アクセス時に通知を受け取るかの確認が出るため，それを許可する．
+    \item サーバ側からWebPushでPush通知を送る．
+    \item ブラウザアプリを通じて通知がくるかを確認する．
+\end{enumerate}
+
+\subsubsection{Webアプリケーションの行動履歴表示実験}
+クラウドサーバの構成要素であるWebアプリケーション(Visualizer-app)の
+行動履歴表示ができるかを確認する．
+
+実験内容としては，
+ダミーで用意した畑の位置情報，センサノード位置情報，経路情報について
+正しく表示できているかをWebページにアクセスして確認する．
+ダミーで用意したデータについては\reft{tb:damy-history}に示す．
+\begin{table}[htbp]
+    \caption{ダミーデータ}
+    \label{tb:damy-history}
+    \centering
+    \begin{tabular}{c|cc|c}\hline
+        データ種類 & 緯度 & 経度 & 注釈\\
+        \hline
+        畑位置 & 34.64801074823137 & 135.75705349445346 & 奈良高専の校庭\\
+        \hline
+        センサ1 & 34.64746793595177 & 135.75796544551852 & 畑の南東\\
+        センサ2 & 34.64801074823137 & 135.75796544551852 & 畑の東\\
+        センサ3 & 34.64852707856505 & 135.75796544551852 & 畑の北東\\
+        センサ4 & 34.64852707856505 & 135.75705349445346 & 畑の北\\
+        センサ5 & 34.64852707856505 & 135.75623810291293 & 畑の北西\\
+        センサ6 & 34.64801074823137 & 135.75623810291293 & 畑の西\\
+        センサ7 & 34.64746793595177 & 135.75623810291293 & 畑の南西\\
+        センサ8 & 34.64746793595177 & 135.75705349445346 & 畑の南\\
+        \hline
+        \multirow{5}{*}{経路情報}
+        & 34.64879186210419 & 135.75744509696963 & 1番目の位置 \\
+        & 34.64826229418025 & 135.75744509696963 & 2番目の位置 \\
+        & 34.64828435957796 & 135.75665116310122 & 3番目の位置 \\
+        & 34.64780333257661 & 135.75666189193728 & 4番目の位置 \\
+        & 34.64724286640332 & 135.75664043426517 & 5番目の位置 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{実験結果}
+\subsubsection{ゲートウェイのLTEモジュールとの疎通実験}
+ゲートウェイとのLTE通信を受信した結果を\reff{fig:lte-post-log}と\reff{fig:lte-post-body}に示す．
+
+\myfigure{./images/lte-post-log.png}{サーバの受信ログ}{fig:lte-post-log}
+\myfigure{./images/lte-post.png}{サーバの受信データ(body情報の一部抜粋)}{fig:lte-post-body}
+
+\reff{fig:lte-post-log}にあるように，「\{``timestamp'':``20240123135017200'',``node'':``1'',``dir'':``1'',\\
+``sd'':``1234567890''\}」
+というデータを受け取ったことがわかる．
+% (それ以外の「\{``node'':``1'',``dir'':``1'',``sd'':``1234567890''\}」と
+% 「\{``timeStamp'':``Jikan'',``NodeID'':\\``ID'',``Direction'':``dir'',``sampledata'':``data dayo!''\}」，
+% 「\{``name'':``andesite'',``age'':\\``20''\}」
+% はサーバが正しく起動しているかどうかの
+% チェックとしてcurlコマンドやJavascriptを用いて送ったものである．)
+また，\reff{fig:lte-post-body}より
+「methods: \{ post: true \}」のようにPOST形式で送られていることがわかる．
+加えて，「[Symbol(kHesaders)]」の項目から
+「content-length」は54，
+「content-type」は`application/x-www-form-urlencoded'
+であることがわかる．
+(「host」の伏せてある部分はクラウドサーバのホスト名である．)
+
+「content-length」はbodyの波括弧(\{\})と空白スペース，クォーテーションを除いた
+数である54文字と一致するため，bodyのデータサイズと考えられる．
+また，「content-type」の`application/x-www-form-urlencoded'は
+HTMLフォームでデータを送信した時と同じタイプであるため\cite{bib:postform-web}，
+ゲートウェイからの通信はHTMLフォームによるアクセスと同義に扱えると考えられる．
+
+\subsubsection{通知サーバのWebPush実験}
+通知サーバの通知結果を\reff{fig:alart-check}と\reff{fig:alart-webpush}
+に示す．今回の実験ではPC版のGoogle Chrome(バージョン:120.0.6099.234（Official Build） （x86\_64）)
+をブラウザとして利用した．
+
+\myfigurem{./images/alart-check.png}{WebPushの通知許可への確認ダイアログ}{fig:alart-check}
+\myfigurem{./images/alart-push.png}{WebPushの通知}{fig:alart-webpush}
+
+\reff{fig:alart-check}はWebPushを実施するアプリケーションサーバにアクセスした時の
+ダイアログである．
+\reff{fig:alart-check}の選択肢で「許可する」を選択することで，WebPushの通知が受け取れるようになる．
+「許可する」を選択後，サーバにWebPush送信用のメソッドを起動するようにシグナルを送ると，
+\reff{fig:alart-webpush}がデスクトップに表示された．
+\reff{fig:alart-webpush}の通り，Google Chromeからの通知であることがわかり，
+Push通知をクリックするとGoogle Chromeに遷移させられたため，Google ChromeによるPush通知だと判断できる．
+
+
+\subsubsection{Webアプリケーションの行動履歴表示実験}
+Webアプリケーションの行動履歴表示について\reft{tb:damy-history}を表示した
+Webページを\reff{fig:map-history}に示す．
+
+\myfigure{./images/map-history.png}{Webアプリケーションの行動履歴表示(ダミーデータ)}{fig:map-history}
+
+\reff{fig:map-history}より，
+奈良高専の校庭を中心とした
+8つのセンサノード(ピン)と，
+行動経路(青い折れ線)が描画されていることがわかる．
+そのため正しくダミーデータ(\reft{tb:damy-history})通りの描画が行えていると判断できる．
+
+
+\subsection{まとめ}
+本章の検証実験により，
+ゲートウェイとの疎通確認および通信方法の特定，
+通知サーバによるWebPushの通知の確認，
+Webアプリケーションによる行動履歴表示の確認
+が行うことができた．
+
+本論文ではできなかったがシステムとして効果を確認するためには，
+赤外線センサノードおよびゲートウェイを実際の畑に設置し，
+動物が畑に侵入した時の実際のセンサデータを取得，
+クラウドサーバへ送信したのち，
+行動解析アルゴリズムを用いて侵入した動物の行動を推定，
+そうして得られたデータからPCやスマートフォンに対してWebPushによる通知，
+ブラウザを通した行動履歴の表示する，
+という一連の流れを検証する必要がある．
+% また，本論文の担当外の機能との連携に伴い，
+% クラウドサーバの機能としては，
+% データ解析ノードの「データ取得」，「データ解析」，「通知シグナル」という
+% 一連の流れを実現する方法を考慮する必要がある．
+
+
+% ソースコードの記述
+% \mylisting{ファイルパス}{caption}{label}
+% \mylisting{report.sty}{レポートのスタイルファイル}{fig:style}
+
+% 図の配置
+% \myfigure{ファイルパス}{caption}{label} サイズが画面横の10割
+% \myfigureh{ファイルパス}{caption}{label} サイズが画面縦の10割
+% \myfigurem{ファイルパス}{caption}{label} サイズが画面横の6割
+% \myfigures{ファイルパス}{caption}{label}{size} サイズが画面横の{size}割
+
+% \myfigure{figure.png}{画像ファイル}{fig:image}
+% \reff{fig:image}
+
+% 式の作成
+% \begin{align}
+%     \label{for:opamp_inout_char}
+%     V_o = A \times (V_+ - V_-)
+% \end{align}
+% \refe{for:opamp_inout_char}
+
+% 表の作成
+% \reft{tb:}
+% \begin{table}[htbp]
+%     \caption{}
+%     \label{tb:}
+%     \centering
+%     \begin{tabular}{|c|c|c|c|c|c|}\hline
+%         器具名 & 個数 & メーカー & 型番 & シリアル番号 & 管理番号 \\ \hline
+%         \hline
+%         TTL-IC用直流電源 & 1台 & --- & --- & --- & 2班 \\ \hline
+%     \end{tabular}
+% \end{table}
+
+% 箇条書き
+% \begin{itemize}
+%     \item 
+% \end{itemize}
+
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    % ----- 仕掛け 開始 -----
+    \newcommand{\ifdraft}{false}
+    % ----- 仕掛け 終了 -----
+    \include{99_references.tex}
+    \end{document}
+\fi

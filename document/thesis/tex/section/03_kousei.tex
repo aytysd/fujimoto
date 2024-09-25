@@ -1,0 +1,245 @@
+%! Tex root = ../main.tex
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    \documentclass[12pt]{honka_v1}
+    \usepackage{soturon}
+    \begin{document}
+\fi
+% 以下本文
+\section{システム構成}
+\subsection{全体構成}
+本研究で作成するシステム全体のシステム図を\reff{fig:all-system}に示す．
+まず，畑内に設置した赤外線センサノード群で動物の侵入を検知し，
+そのデータをワイヤレス通信のLoRa通信を用いてゲートウェイに集約する．
+ゲートウェイは集約されたデータをLTE通信を用いてInternet経由で
+クラウドサーバにデータを送信する．
+クラウドサーバではデータの管理やデータの解析，
+農業従事者への通知および解析結果の表示を行う．
+本論文ではクラウドサーバの解析アルゴリズム以外を担うため，
+次節でクラウドサーバの構成と詳細について述べる．
+
+\myfigure{./images/all-system.pdf}{全体のシステム図}{fig:all-system}
+
+\subsection{サーバ構成}
+
+本システムのクラウドサーバは\reff{fig:all-system}にある通り，
+以下の4つの役割の担い，それぞれの役割が連携しながら処理を行う．
+\begin{itemize}
+    \item データベース
+    \item 解析ノード
+    \item 通知サーバ
+    \item Webアプリケーション
+\end{itemize}
+
+クラウドサーバの役割が4つあり，それぞれが連携するため処理の流れが複雑になっている．
+クラウドサーバの処理を整理するためにDFD(Data Flow Diagram)を\reff{fig:srv-dfd0}と\reff{fig:srv-dfd}に示す．
+クラウドサーバの処理には
+畑のデータを送ってくるゲートウェイ，
+本システムに登録して通知や解析結果を受け取る農業従事者，
+センサデータや解析データ，農業従事者の登録者情報を保存するデータベース
+が関わっている．
+ゲートウェイからは畑で検知したセンサデータがクラウドサーバへ一方的に送信される．
+クラウドサーバでは送信されてきたセンサデータをデータベースに一時的に保存する．
+保存したセンサデータを用いて解析を行い，通知と解析後データの保存を行う．
+通知では事前に登録した農業従事者の登録者情報からPush通知を行う．
+また，解析後データから行動履歴表示を行うWebアプリケーションを農業従事者へ提供する．
+
+% ゲートウェイからは農場で得られた赤外線センサのデータがクラウドサーバへ一方的に送信されてくる．
+% 農業従事者については畑の情報や認証用の本人情報などを含んだ登録者情報を受け取り，
+% 畑に動物の侵入があったことを知らせるPush通知と
+% センサデータを解析した結果得られた行動軌跡についての情報をまとめた行動履歴を提供する．
+% データベースには畑から得られたセンサデータおよび解析後データと農業従事者から受け取った登録者情報を保管する．
+
+\myfigures{./images/server-dfd0.pdf}{クラウドサーバのDFD(レベル0)}{fig:srv-dfd0}{6}
+\myfigures{./images/server-dfd.pdf}{クラウドサーバのDFD(レベル1)}{fig:srv-dfd}{9}
+
+クラウドサーバのDFD(\reff{fig:srv-dfd0}と\reff{fig:srv-dfd})を参考にクラウドサーバ上の構成を決める．
+本システムのクラウドサーバは文字通り，クラウド上にシステムを設置するため，
+開発環境(手元のPC)とのOSの違いといった環境差が生じる．
+そういった環境差を最小限にするためにDockerを用いてDockerコンテナ内に各システムを構築する．
+また，クラウド内の4つのシステムを連携させるためにDocker Composeを用いる．
+
+Docker Composeを用いて作成するクラウドサーバの内部ネットワークを\reff{fig:srv-network}に示す．
+クラウドサーバ内部に作成するDockerコンテナは以下の6つである．
+また，Dockerコンテナごとの詳細については後述する．
+\begin{itemize}
+    \item リバースプロキシ(Reverse Proxy)
+    \item 通知サーバ(Notification-app)
+    \item Webアプリケーション(Visualizer-app)
+    \item データベース\begin{itemize}
+        \item データベースのアクセス制御(Database-API)
+        \item データベース本体(Database)
+    \end{itemize}
+    \item 解析ノード(Analyzer-node)
+\end{itemize}
+
+また，Dockerコンテナ間などの通信を行うためにDockerネットワークを以下の3つ用意する．
+\begin{itemize}
+    \item surface
+    \item inside
+    \item db-bus
+\end{itemize}
+surfaceネットワークではInternetと接続するDockerコンテナのみ所属させる．
+insideネットワークには基本的なDockerコンテナ全て所属させる．
+db-busネットワークにはデータベース管理の処理を担うDockerコンテナのみ所属させる．
+
+\myfigure{./images/server-network.pdf}{クラウドサーバのネットワーク図}{fig:srv-network}
+
+
+
+% ============================
+\subsubsection{リバースプロキシ(Reverse Proxy)}
+クラウドサーバには前述の4つの役割があり，それぞれについてDockerコンテナが作成される．
+しかし，クラウドサーバ内に4つのサーバを作成するとなると，
+ポートの衝突などを回避するためにDockerコンテナごとに設定を細かく変える必要が出てくる．
+細かい設定が増えるとクラウドサーバ全体の設定を把握しづらくなり管理保守することが難しくなる．
+そこでリバースプロキシを用いてInternetとクラウドサーバ内部のDockerコンテナを仲介・制御する．
+リバースプロキシは外からのアクセスの種類によって内部のどのサーバと通信するかを制御する機能を持ったサーバのことである．
+リバースプロキシによって，クラウドサーバ内部に存在する複数機能を担う各Dockerコンテナへのアクセスを
+まとめて管理する．
+
+実装するリバースプロキシの具体的な仕様としては，
+クラウドサーバにくる全てのデータアクセス(HTTP通信)を役割ごとに適当なDockerコンテナに通信するため，
+surfaceネットワークとinsideネットワークに所属する．
+% リバースプロキシではサーバにくる全てのデータアクセス(HTTP通信)を役割ごとに適当なDockerコンテナに通信するように制御を行い，
+% クラウドサーバの門番的な役割を担う．
+% そのため，Dockerネットワークとしてはsurfaceネットワークとinsideネットワークに所属する．
+
+NginxのDockerイメージをベースとし，/etc/nginx/nginx.confを編集することで
+リバースプロキシサーバとしてDockerコンテナを作成する．
+
+リバースプロキシで行う転送処理は以下の通りである．
+
+\begin{description}
+    \item[/notification :]    通知サーバ(Notification-app)
+    \item[/maps :]            Webアプリケーション(Visualizer-app)
+    \item[/nodegw (POST) :]   データベース(Database-API)
+\end{description}
+
+
+
+% ============================
+\subsubsection{通知サーバ(Notification-app)}
+通知サーバではレベル1のDFD\reff{fig:srv-dfd}にある「4. 通知」で行うため．Push通知を用いて農業従事者への通知を実現する．
+まず，Push通知はスマートフォンやパソコンなどに搭載されている通知方法の一つで，
+画面を付けていない状態や別のアプリを利用中といった場面でも通知音やバナーといった方法で即時通知することができる．
+このような常に通知用の管理画面を開く必要がないことや即時性に着目して，
+通知をPush通知を用いて実現することにした．
+しかし基本的なPush通知の実装はその端末にあったアプリケーションを作成する必要があり，
+AndroidやiOS，Windows，MacOSといった対応させたいOSの数だけアプリケーションを作成する必要がある．
+内部構造が基本的に同じになるとは言ってもOSごとのアプリケーションを作成するのはコストが高く，
+バージョンアップといった保守の手間も非常に大きい．
+
+そこで，WebPushというものを活用する．
+WebPushはブラウザを用いたPush通知を行う仕組みであり，一つのWebサーバを作成するだけで
+対応するブラウザを介して複数種類の端末でPush通知を実現することができる．
+またWebPushは基本的なブラウザに対応しているため，簡単に複数種類の端末へのPush通知が実現することが可能である．
+
+
+したがって，通知サーバでは登録された畑に動物の侵入があったことをWebPushを用いて農業従事者に通知するサーバを実現する．
+具体的には
+WebPushでVAPIDを用いてサーバの登録を行い，
+Node.jsのDockerイメージをベースとしてWebPushを行うサーバを実現する．
+
+通知サーバはレベル1のDFD(\reff{fig:srv-dfd})においては「4. 通知」を主に担う．
+そのため「2. 解析」からの通知シグナルとデータベースから登録者情報を取得するために
+DockerネットワークでAnalyzer-nodeおよびDatabase-APIと同じinsideに所属する．
+
+
+
+% ============================
+\subsubsection{Webアプリケーション(Visualizer-app)}
+Webアプリケーションではレベル1のDFD\reff{fig:srv-dfd}にある「3. 登録」と「5. 行動履歴表示」を行う．
+行動履歴表示では特に侵入した動物の侵入経路の分かりやすさが重要である．
+そこでLeaflet.jsというマップライブラリを用いる．
+Lealfet.jsは地図の拡大縮小やマーカの表示など基本的な地図アプリの機能に加えて，
+線や多角形領域，ピンといったマーカを地図に投影することができるため採用する．
+加えて，WebページとしてJavaScript(Leaflet.js)を利用するため，
+JavaScriptのNode.jsを用いることで利用する言語を統一し，管理を容易にする．
+
+また，
+本システムは複数の農業従事者および畑を対象としてサービスを提供するため，
+どこの畑で，誰が管理者であるかを登録する必要がある．
+登録ページについて開発中のページを\reff{fig:map-register}に示す．
+
+\myfigure{./images/map-register.png}{開発中の登録ページ}{fig:map-register}
+
+% Webアプリケーションでは畑の登録と解析データから得られた行動履歴の表示を実現する．
+% Webアプリケーションでは畑など地図の表示および図形の投影が必要なため，
+Webアプリケーションの具体的な実装としては，
+Node.jsのDockerイメージをベースとしてHTMLやCSS，Leaflet.jsを含めたJavaScriptを用いて実現する．
+Webアプリケーションはレベル1のDFD(\reff{fig:srv-dfd})においては「3. 登録」と「5. 行動履歴表示」
+を主に担う．
+そのためデータベースへの登録者情報の保存および解析後データの取得するため，
+DockerネットワークでDatabase-APIと同じinsideに所属する．
+
+
+
+% ============================
+\subsubsection{データベース(Database, Database-API)}
+データベースではMySQLを用いたデータベースコンテナと
+Node.jsを用いたデータベースコンテナ管理用のAPIコンテナの2つで構成する．
+APIコンテナでデータベースアクセスを仲介することで，
+データベースアクセスの簡易化や誤操作の抑制を実現する．
+
+Dockerネットワークとしてはdb-busネットワークに所属して，
+他のDockerコンテナからデータベースアクセスを受けるためにDatabase-APIコンテナのみ
+insideネットワークにも所属する．
+
+
+% ============================
+\subsubsection{データ解析ノード(Analyzer-node)}
+データ解析ノードではpythonイメージを主体としてデータベースに蓄えられる赤外線センサのデータを解析する役割を持つ．
+本コンテナではDatabase-APIコンテナと通信してデータの取得および解析後のデータの保存を行い，通知サーバに通知シグナルを送信する．
+そのため，Dockerネットワークとしてはinsideネットワークに所属する．
+
+解析の詳細に関しては本論文範囲外であるため割愛する．
+
+
+
+
+
+% ソースコードの記述
+% \mylisting{ファイルパス}{caption}{label}
+% \mylisting{report.sty}{レポートのスタイルファイル}{fig:style}
+
+% 図の配置
+% \myfigure{ファイルパス}{caption}{label} サイズが画面横の10割
+% \myfigureh{ファイルパス}{caption}{label} サイズが画面縦の10割
+% \myfigurem{ファイルパス}{caption}{label} サイズが画面横の6割
+% \myfigures{ファイルパス}{caption}{label}{size} サイズが画面横の{size}割
+
+% \myfigure{figure.png}{画像ファイル}{fig:image}
+% \reff{fig:image}
+
+% 式の作成
+% \begin{align}
+%     \label{for:opamp_inout_char}
+%     V_o = A \times (V_+ - V_-)
+% \end{align}
+% \refe{for:opamp_inout_char}
+
+% 表の作成
+% \reft{tb:}
+% \begin{table}[htbp]
+%     \caption{}
+%     \label{tb:}
+%     \centering
+%     \begin{tabular}{|c|c|c|c|c|c|}\hline
+%         器具名 & 個数 & メーカー & 型番 & シリアル番号 & 管理番号 \\ \hline
+%         \hline
+%         TTL-IC用直流電源 & 1台 & --- & --- & --- & 2班 \\ \hline
+%     \end{tabular}
+% \end{table}
+
+% 箇条書き
+% \begin{itemize}
+%     \item 
+% \end{itemize}
+
+\expandafter\ifx\csname ifdraft\endcsname\relax
+    % ----- 仕掛け 開始 -----
+    \newcommand{\ifdraft}{false}
+    % ----- 仕掛け 終了 -----
+    \include{99_references.tex}
+    \end{document}
+\fi

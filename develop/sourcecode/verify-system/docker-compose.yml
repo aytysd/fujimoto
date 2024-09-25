@@ -1,0 +1,104 @@
+version: "3"
+services:
+  # リバースプロキシ
+  reverse-proxy:
+    build: ./reverse-proxy
+    image: reverse-proxy-img
+    container_name: reverse-proxy
+    depends_on:
+      - notification-app
+      - visualizer-app
+      # - database-api
+    ports:
+      - 80:80
+    # volumes:
+    #   - 
+    networks:
+      - surface
+      - inside
+
+  # 通知アプリ
+  notification-app:
+    # build: ./notification-app
+    # image: notification-app-img
+    image: nginx # demo image
+    container_name: notification-app
+    # ports:
+    #   - 
+    # volumes:
+    #   - 
+    # command: echo notification-app > /usr/share/nginx/html/index.html
+    # echoコマンドが終了するとコンテナもなぜか終了するからコメントアウトした
+    networks:
+      - inside
+
+  # マップアプリ(ビジュアライザ)
+  visualizer-app:
+    build: ./visualizer-app
+    image: visualizer-app-img
+    # image: nginx  # デモ用
+    container_name: visualizer-app
+    # ports:
+    #   - 80:80
+    volumes:
+      - ./visualizer-app/src:/app/src
+    command: node /app/src/server.js
+    init: true
+    networks:
+      - inside
+
+  # # データ解析ノード
+  # analizer-node:
+  #   # build: ./analizer-node
+  #   # image: analizer-node-img
+  #   image: nginx
+  #   command: echo analizer-node > /usr/share/nginx/html/index.html
+  #   container_name: analizer-node
+  #   # ports:
+  #   #   - 
+  #   # volumes:
+  #   #   - 
+  #   networks:
+  #     - inside
+
+  # # データベースのAPI
+  # database-api:
+  #   # build: ./database-api
+  #   # image: database-api-img
+  #   image: nginx
+  #   command: echo database-api > /usr/share/nginx/html/index.html
+  #   container_name: database-api
+  #   # ports:
+  #   #   - 
+  #   # volumes:
+  #   #   - 
+  #   networks:
+  #     - inside
+  #     - db-bus
+
+  # データベース
+  # database:
+  #   networks:
+  #     - db-bus
+
+networks:
+  surface:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.0.0/30
+  inside:
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.10.0/28
+  db-bus:
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.255.0/29

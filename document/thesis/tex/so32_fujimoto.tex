@@ -1,0 +1,58 @@
+\documentclass[12pt]{honka_v1}
+
+\usepackage{soturon}
+\usepackage{parameter}
+
+% ----- 仕掛け 開始 -----
+\newcommand{\ifdraft}{false}
+% ----- 仕掛け 終了 -----
+
+
+\setcounter{secnumdepth}{4}
+
+
+\begin{document} % 論文の始まり始まり～
+
+% \titlepage
+%----- アブストラクト（概要）
+% ここには研究論文の概要を書く．
+% 研究としては，背景，目的，方法，結果が書かれているはずなので，
+% それを1pにまとめて記述する．最後は研究結果なので，過去形で終わるはずである．
+% \begin{abstract}
+
+% \end{abstract}
+\include{section/00_abstract.tex}
+
+\tableofcontents
+
+%==========[ beginning of main Subject ]==========%
+\start
+\include{section/01_maegaki.tex}
+
+\include{section/02_riron.tex}
+
+\include{section/03_kousei.tex}
+
+\include{section/04_kekka.tex}
+
+% \include{section/05_kousatu.tex}
+
+\include{section/10_atogaki.tex}
+
+% 謝辞
+% \wordsofthanks{}
+% \include{thanks.tex}
+
+%----------[ 参考文献 ]----------%
+% \begin{thebibliography}{99}
+
+%   \bibitem{bib:Ishizaka}
+%   石坂守，山口賢一，岩田大志:``スキャン非同期記憶素子およびそれを備えた半導体集積回路ならびにその設計方法およびテストパターン'', 電子情報通信学会論文A,Vol.j102-A,No.6,pp.172-181,Jun.(2019)
+
+% \end{thebibliography}
+\include{section/99_references}
+
+%----------[ 付録 ]----------%
+
+
+\end{document}
